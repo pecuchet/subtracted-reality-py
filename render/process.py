@@ -20,10 +20,10 @@ def subtract(foreground, background):
     # extract the foreground image from the camera feed
     fg_mask = cv2.bitwise_and(foreground, foreground, mask=cv2.bitwise_not(image_mask))
 
-    return {
-        bg_mask: bg_mask,
-        fg_mask: fg_mask
-    }
+    return dict(
+        bg_mask=bg_mask,
+        fg_mask=fg_mask
+    )
 
 
 def mirror(frame):

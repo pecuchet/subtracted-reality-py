@@ -3,17 +3,24 @@ import sys
 import config
 
 from render import process
-from videoCamStream import VideoCamStream
-from videoPiStream import VideoPiStream
 
 debug = config.DEBUG
 
 
-def load_background():
+def _load_background():
     return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
 
 
-def on_frame_buffer():
+def _start_camera(cam_type):
+    if type == 'pi':
+        from videoPiStream import VideoPiStream
+        return VideoPiStream(resolution=config.SIZE).start()
+    else:
+        from videoCamStream import VideoCamStream
+        return VideoCamStream(src=0).start()
+
+
+def on_frame_buffer(cam_type):
     """
     Display real time chroma key on the frame buffer through Pygame.
     :return:
@@ -22,8 +29,8 @@ def on_frame_buffer():
     global debug
 
     py_game_inst = framebuffer.PyGameRender(config.SIZE)
-    background = load_background()
-    video = VideoPiStream(resolution=config.SIZE).start()
+    background = _load_background()
+    video = _start_camera(cam_type)
 
     frame_count = 0
     fps = None
@@ -64,7 +71,7 @@ def on_frame_buffer():
     sys.exit()
 
 
-def in_window():
+def in_window(cam_type):
     """
     Display real time chroma key in a X server window through OpenCV.
     :return:
@@ -74,8 +81,8 @@ def in_window():
     # cv2.startWindowThread()  # This bugs: glib-gobject-critical ** g_object_unref assertion
 
     cv2.namedWindow(config.WINDOW_NAME, flags=cv2.WINDOW_AUTOSIZE)
-    background = load_background()
-    video = VideoPiStream(resolution=config.SIZE).start()
+    background = _load_background()
+    video = _start_camera(cam_type)
 
     frame_count = 0
     fps = None
@@ -100,7 +107,7 @@ def in_window():
         frames = process.subtract(foreground, background)
 
         # CV2 output: composite both streams
-        cv2.imshow(config.WINDOW_NAME, cv2.add(frames.bg_mask, frames.fg_mask))
+        cv2.imshow(config.WINDOW_NAME, cv2.add(frames['bg_mask'], frames['fg_mask']))
 
         # update the FPS counter
         if debug:
