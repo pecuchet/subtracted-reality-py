@@ -14,6 +14,7 @@ class VideoCamStream(videoStream.VideoStream):
         Initialize the video stream + read the first frame.
         :param src: int for camera || string for video file path
         """
+        super().__init__()
         self.stream = cv2.VideoCapture(src)
         self.stream.set(3, 640)
         self.stream.set(4, 480)

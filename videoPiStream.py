@@ -34,6 +34,7 @@ class VideoPiStream(videoStream.VideoStream):
         :param resolution:
         :param framerate:
         """
+        super().__init__()
         self.camera = PiCamera()
         # self.camera.hflip = True
         # self.camera.vflip = True
