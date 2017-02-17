@@ -7,19 +7,6 @@ from render import process
 debug = config.DEBUG
 
 
-def _load_background():
-    return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
-
-
-def _start_camera(cam_type):
-    if type == 'pi':
-        from videoPiStream import VideoPiStream
-        return VideoPiStream(resolution=config.SIZE).start()
-    else:
-        from videoCamStream import VideoCamStream
-        return VideoCamStream(src=0).start()
-
-
 def on_frame_buffer(cam_type):
     """
     Display real time chroma key on the frame buffer through Pygame.
@@ -122,3 +109,16 @@ def in_window(cam_type):
     video.stop()
     cv2.destroyAllWindows()
     sys.exit()
+
+
+def _load_background():
+    return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
+
+
+def _start_camera(cam_type):
+    if type == 'pi':
+        from videoPiStream import VideoPiStream
+        return VideoPiStream(resolution=config.SIZE).start()
+    else:
+        from videoCamStream import VideoCamStream
+        return VideoCamStream(src=0).start()
