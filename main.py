@@ -62,7 +62,7 @@ def on_frame_buffer(cam_type):
 
         if stop:
             if debug:
-                print_fps_info(fps)
+                fps.stop()
             break
 
     # close
@@ -116,15 +116,9 @@ def in_window(cam_type):
         # interrupt
         if cv2.waitKey(40) & 0xFF == ord('q'):
             if debug:
-                print_fps_info(fps)
+                fps.stop()
             break
 
     video.stop()
     cv2.destroyAllWindows()
     sys.exit()
-
-
-def print_fps_info(fps):
-    fps.stop()
-    print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))

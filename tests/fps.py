@@ -21,6 +21,8 @@ class FPS:
     def stop(self):
         # stop the timer
         self._end = datetime.datetime.now()
+        print("[INFO] elapsed time: {:.2f}".format(self.elapsed()))
+        print("[INFO] approx. FPS: {:.2f}".format(self.fps()))
 
     def update(self):
         # increment the total number of frames examined during the
