@@ -7,7 +7,7 @@ from render import process
 debug = config.DEBUG
 
 
-def on_frame_buffer(cam_type):
+def on_frame_buffer(cam_type, bg_file):
     """
     Display real time chroma key on the frame buffer through Pygame.
     :return:
@@ -16,7 +16,7 @@ def on_frame_buffer(cam_type):
     global debug
 
     py_game_inst = framebuffer.PyGameRender(config.SIZE)
-    background = _load_background()
+    background = _load_background(bg_file)
     video = _start_camera(cam_type)
 
     frame_count = 0
@@ -58,7 +58,7 @@ def on_frame_buffer(cam_type):
     sys.exit()
 
 
-def in_window(cam_type):
+def in_window(cam_type, bg_file):
     """
     Display real time chroma key in a X server window through OpenCV.
     :return:
@@ -68,7 +68,7 @@ def in_window(cam_type):
     # cv2.startWindowThread()  # This bugs: glib-gobject-critical ** g_object_unref assertion
 
     cv2.namedWindow(config.WINDOW_NAME, flags=cv2.WINDOW_AUTOSIZE)
-    background = _load_background()
+    background = _load_background(bg_file)
     video = _start_camera(cam_type)
 
     frame_count = 0
@@ -111,8 +111,14 @@ def in_window(cam_type):
     sys.exit()
 
 
-def _load_background():
-    return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
+def _load_background(file):
+    global debug
+    if not file and debug:
+        return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
+    if file.lower().endswith(('.mov', '.mp4')):
+        return cv2.VideoCapture(file)
+    # let's assume it is an image file
+    return cv2.imread(file)
 
 
 def _start_camera(cam_type):
