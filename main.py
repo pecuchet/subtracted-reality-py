@@ -116,7 +116,7 @@ def in_window(cam_type, bg_file):
             bg.stream.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
 
-        background = cv2.resize(background, (640, 480))
+        background = cv2.resize(background, config.SIZE)
 
         # do the chroma key
         frames = process.subtract(foreground, background)
@@ -129,10 +129,37 @@ def in_window(cam_type, bg_file):
             fps.update()
 
         # interrupt
-        if cv2.waitKey(40) & 0xFF == ord('q'):
-            if debug:
-                fps.stop()
-            break
+        key = cv2.waitKey(40) & 0xFF
+        if key in range(ord('a'), ord('z')):
+            if key == ord('q'):
+                if debug:
+                    fps.stop()
+                break
+            elif key == ord('e'):
+                config.COLOUR_IN[0] -= 1
+            elif key == ord('r'):
+                config.COLOUR_IN[0] += 1
+            elif key == ord('t'):
+                config.COLOUR_OUT[0] -= 1
+            elif key == ord('y'):
+                config.COLOUR_OUT[0] += 1
+            elif key == ord('d'):
+                config.COLOUR_IN[1] -= 1
+            elif key == ord('f'):
+                config.COLOUR_IN[1] += 1
+            elif key == ord('g'):
+                config.COLOUR_OUT[1] -= 1
+            elif key == ord('h'):
+                config.COLOUR_OUT[1] += 1
+            elif key == ord('c'):
+                config.COLOUR_IN[2] -= 1
+            elif key == ord('v'):
+                config.COLOUR_IN[2] += 1
+            elif key == ord('b'):
+                config.COLOUR_OUT[2] -= 1
+            elif key == ord('n'):
+                config.COLOUR_OUT[2] += 1
+            print 'LOWER: %s UPPER: %s' % (config.COLOUR_IN, config.COLOUR_OUT)
 
     video.stop()
     cv2.destroyAllWindows()
@@ -156,3 +183,10 @@ def _start_camera(cam_type):
     else:
         from videoCamStream import VideoCamStream
         return VideoCamStream(src=0).start()
+
+def main():
+    #in_window('', config.DIR + '/assets/sea_4-3.mp4')
+    in_window('', config.DIR + '/assets/test-card_640x480.png')
+
+if __name__ == '__main__':
+    main()

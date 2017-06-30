@@ -15,6 +15,7 @@ def subtract(foreground, background):
     hsv = cv2.cvtColor(foreground, cv2.COLOR_BGR2HSV)
     # calculate the background mask
     image_mask = cv2.inRange(hsv, numpy.array(config.COLOUR_IN), numpy.array(config.COLOUR_OUT))
+    #image_mask = cv2.resize(image_mask, config.SIZE)
     # apply background mask on background to obscure the keyed color
     bg_mask = cv2.bitwise_and(background, background, mask=image_mask)
     # extract the foreground image from the camera feed
