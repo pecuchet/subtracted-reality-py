@@ -66,10 +66,20 @@ def in_window(cam_type, bg_file):
     global debug
 
     # cv2.startWindowThread()  # This bugs: glib-gobject-critical ** g_object_unref assertion
-
     cv2.namedWindow(config.WINDOW_NAME, flags=cv2.WINDOW_AUTOSIZE)
-    background = _load_background(bg_file)
-    video = _start_camera(cam_type)
+
+    from videoCamStream import VideoCamStream
+    
+    # init cam
+    video = VideoCamStream(src=0).start()
+
+    # get background
+    if bg_file.lower().endswith(('.mov', '.mp4')):
+        bg_type = 'video'
+        bg = VideoCamStream(src=config.DIR + '/assets/sea_4-3.mov').start()
+    else:
+        bg_type = 'image'
+        bg = cv2.imread(config.DIR + '/assets/test-card_640x480.png')
 
     frame_count = 0
     fps = None
@@ -80,8 +90,18 @@ def in_window(cam_type, bg_file):
 
     # main loop
     while True:
+        # ready to read background video?
+        if bg_type == 'video' and not bg.stream.isOpened():
+            continue
+
         # grab the frame from the threaded video stream
         foreground = video.read()
+
+        if bg_type == 'video':
+            # read background frame
+            background = bg.read()
+        else:
+            background = bg
 
         # do not continue if no frame from cam yet
         # and prevent too much processing...
@@ -89,6 +109,14 @@ def in_window(cam_type, bg_file):
         if foreground is None or frame_count % 40 != 0:
             continue
         frame_count = 0
+
+        # if end of background video, loop back
+        if bg_type == 'video' and background is None:
+            print("The sea ends here\n")
+            bg.stream.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
+
+        background = cv2.resize(background, (640, 480))
 
         # do the chroma key
         frames = process.subtract(foreground, background)
