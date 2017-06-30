@@ -1,6 +1,7 @@
 import videoStream
 from picamera.array import PiRGBArray
 from picamera import PiCamera
+import config
 
 
 class VideoPiStream(videoStream.VideoStream):
@@ -28,7 +29,7 @@ class VideoPiStream(videoStream.VideoStream):
         camera.crop = (0.0, 0.0, 1.0, 1.0)
     """
 
-    def __init__(self, resolution=(640, 480), framerate=25):
+    def __init__(self, resolution=config.SIZE, framerate=25):
         """
         Initialize the camera and stream
         :param resolution:

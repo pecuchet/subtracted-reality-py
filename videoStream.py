@@ -18,7 +18,10 @@ class VideoStream:
         Daemon argument is set to True, forcing the Thread to exit when the program stops.
         :return:
         """
-        Thread(target=self.update, args=(), daemon=True).start()
+        #Thread(target=self.update, args=(), daemon=True).start()
+        # Works on Python 3.2 and lower
+        Thread(target=self.update, args=()).start()
+        self.daemon = True
         return self
 
     def update(self):
