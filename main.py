@@ -116,6 +116,11 @@ def in_window(cam_type, bg_file):
             bg.stream.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
 
+        if debug:
+            cv2.putText(foreground, '          H   S   V', (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 2)
+            cv2.putText(foreground, 'LOWER: %s' % (config.COLOUR_IN), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
+            cv2.putText(foreground, 'UPPER: %s' % (config.COLOUR_OUT), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
+
         background = cv2.resize(background, config.SIZE)
 
         # do the chroma key
@@ -130,36 +135,39 @@ def in_window(cam_type, bg_file):
 
         # interrupt
         key = cv2.waitKey(40) & 0xFF
-        if key in range(ord('a'), ord('z')):
+        if key in range(ord('A'), ord('z')):
             if key == ord('q'):
                 if debug:
                     fps.stop()
                 break
-            elif key == ord('e'):
+            elif key == ord('D'):
+                debug = not debug
+            elif key == ord('e') and 0 < config.COLOUR_IN[0]:
                 config.COLOUR_IN[0] -= 1
-            elif key == ord('r'):
+            elif key == ord('r') and config.COLOUR_IN[0] < config.COLOUR_OUT[0]:
                 config.COLOUR_IN[0] += 1
-            elif key == ord('t'):
+            elif key == ord('t') and config.COLOUR_IN[0] < config.COLOUR_OUT[0]:
                 config.COLOUR_OUT[0] -= 1
-            elif key == ord('y'):
+            elif key == ord('y') and config.COLOUR_OUT[0] < 255:
                 config.COLOUR_OUT[0] += 1
-            elif key == ord('d'):
+            elif key == ord('d') and 0 < config.COLOUR_IN[1]:
                 config.COLOUR_IN[1] -= 1
-            elif key == ord('f'):
+            elif key == ord('f') and config.COLOUR_IN[1] < config.COLOUR_OUT[1]:
                 config.COLOUR_IN[1] += 1
-            elif key == ord('g'):
+            elif key == ord('g') and config.COLOUR_IN[1] < config.COLOUR_OUT[1]:
                 config.COLOUR_OUT[1] -= 1
-            elif key == ord('h'):
+            elif key == ord('h') and config.COLOUR_OUT[1] < 255:
                 config.COLOUR_OUT[1] += 1
-            elif key == ord('c'):
+            elif key == ord('c') and 0 < config.COLOUR_IN[2]:
                 config.COLOUR_IN[2] -= 1
-            elif key == ord('v'):
+            elif key == ord('v') and config.COLOUR_IN[2] < config.COLOUR_OUT[2]:
                 config.COLOUR_IN[2] += 1
-            elif key == ord('b'):
+            elif key == ord('b') and config.COLOUR_IN[2] < config.COLOUR_OUT[2]:
                 config.COLOUR_OUT[2] -= 1
-            elif key == ord('n'):
+            elif key == ord('n') and config.COLOUR_OUT[2] < 255:
                 config.COLOUR_OUT[2] += 1
-            print 'LOWER: %s UPPER: %s' % (config.COLOUR_IN, config.COLOUR_OUT)
+            if debug:
+                print 'LOWER: %s UPPER: %s' % (config.COLOUR_IN, config.COLOUR_OUT)
 
     video.stop()
     cv2.destroyAllWindows()
