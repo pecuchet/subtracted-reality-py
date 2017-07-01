@@ -1,3 +1,4 @@
+import config
 import cv2
 import videoStream
 
@@ -18,8 +19,8 @@ class VideoCamStream(videoStream.VideoStream):
         #super(self.__class__, self).__init__()
         videoStream.VideoStream.__init__(self)
         self.stream = cv2.VideoCapture(src)
-        self.stream.set(3, 640)
-        self.stream.set(4, 480)
+        self.stream.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, config.SIZE[0])
+        self.stream.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, config.SIZE[1])
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
 

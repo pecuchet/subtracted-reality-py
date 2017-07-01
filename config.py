@@ -5,11 +5,13 @@ Constants
 """
 
 DEBUG = 1
-SIZE = (640, 480)
-#SIZE = (960, 720)
-#SIZE = (1280, 960)
+#SIZE = (640, 480)
+SIZE = (1280, 720)
 WINDOW_NAME = 'Subtracted reality'
 DIR = os.path.dirname(os.path.realpath(__file__))
+FILE = 'assets/test-card_640x480.png'
+#FILE = 'sea_4-3.mov'
+FRAMERATE = 30
 
 # COLOUR IN HSV
 # HUE ranges from 0 - 179
