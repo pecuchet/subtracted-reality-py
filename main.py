@@ -6,9 +6,15 @@ import sys
 from render import process
 
 debug = config.DEBUG
+bg_type = 'image'
+
+if config.CAMERA == 'pi':
+    from videoPiStream import VideoPiStream
+else:
+    from videoCamStream import VideoCamStream
 
 
-def on_frame_buffer(cam_type, bg_file):
+def on_frame_buffer(bg_file):
     """
     Display real time chroma key on the frame buffer through Pygame.
     :return:
@@ -18,7 +24,7 @@ def on_frame_buffer(cam_type, bg_file):
 
     py_game_inst = framebuffer.PyGameRender(config.SIZE)
     background = _load_background(bg_file)
-    video = _start_camera(cam_type)
+    video = _start_camera()
 
     frame_count = 0
     fps = None
@@ -59,28 +65,24 @@ def on_frame_buffer(cam_type, bg_file):
     sys.exit()
 
 
-def in_window(cam_type, bg_file):
+def in_window(bg_file):
     """
     Display real time chroma key in a X server window through OpenCV.
     :return:
     """
-    global debug
+    global debug, bg_type
 
     # cv2.startWindowThread()  # This bugs: glib-gobject-critical ** g_object_unref assertion
     cv2.namedWindow(config.WINDOW_NAME, flags=cv2.WINDOW_AUTOSIZE)
-
-    from videoCamStream import VideoCamStream
+    # todo full screen
+    # cv2.namedWindow(config.WINDOW_NAME, flags=cv2.WND_PROP_FULLSCREEN)
+    # cv2.setWindowProperty(config.WINDOW_NAME, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     
     # init cam
-    video = VideoCamStream(src=0).start()
+    video = _start_camera()
 
     # get background
-    if bg_file.lower().endswith(('.mov', '.mp4')):
-        bg_type = 'video'
-        bg = VideoCamStream(src=bg_file).start()
-    else:
-        bg_type = 'image'
-        background = cv2.imread(bg_file)
+    bg = _load_background(bg_file)
 
     frame_count = 0
     fps = None
@@ -91,34 +93,40 @@ def in_window(cam_type, bg_file):
 
     # main loop
     while True:
-        # ready to read background video?
+        # prevent too much processing...
+        frame_count += 1
+        if frame_count % 40 != 0:
+            continue
+        frame_count = 0
+
+        # background video ready?
         if bg_type == 'video' and not bg.stream.isOpened():
             continue
 
         # grab the frame from the threaded video stream
         foreground = video.read()
 
-        if bg_type == 'video':
-            # read background frame
-            background = bg.read()
-
         # do not continue if no frame from cam yet
-        # and prevent too much processing...
-        frame_count += 1
-        if foreground is None or frame_count % 40 != 0:
+        if foreground is None:
             continue
-        frame_count = 0
+
+        # read background frame
+        background = bg.read() if bg_type == 'video' else bg
 
         # if end of background video, loop back
+        # todo use CV_CAP_PROP_FRAME_COUNT & CV_CAP_PROP_POS_FRAMES
         if bg_type == 'video' and background is None:
             print("The sea ends here\n")
             bg.stream.set(cv2.CAP_PROP_POS_FRAMES, 0)
             continue
 
-        foreground = cv2.flip(foreground, 1)
+        # let's do this in VideoCamStream since PiCamera has an option for it
+        # foreground = cv2.flip(foreground, 1)
 
-        background = cv2.resize(background, config.SIZE)
-        foreground = cv2.resize(foreground, config.SIZE)
+        # do this outside the loop (for images)
+        # background = cv2.resize(background, config.SIZE)
+        # not needed: video is already resized in class
+        # foreground = cv2.resize(foreground, config.SIZE)
 
         if debug:
             cv2.putText(foreground, '         H    S    V', (10, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
@@ -177,27 +185,36 @@ def in_window(cam_type, bg_file):
 
 
 def _load_background(file):
-    global debug
-    if not file and debug:
-        return cv2.imread(config.DIR + '/assets/test-card_640x480.png')
+    """
+    Decide what to load as background: an image or a video
+    :param file:
+    :return:
+    """
+    global debug, bg_type
     if file.lower().endswith(('.mov', '.mp4')):
-        return cv2.VideoCapture(file)
-    # let's assume it is an image file
-    return cv2.imread(file)
+        bg_type = 'video'
+        return VideoCamStream(resolution=config.SIZE, frame_rate=config.FRAMERATE, src=file).start()
+    # let's assume it's an image file
+    bg_type = 'image'
+    bg_img = cv2.imread(file)
+    return cv2.resize(bg_img, config.SIZE)
 
 
-def _start_camera(cam_type):
-    if type == 'pi':
-        from videoPiStream import VideoPiStream
-        return VideoPiStream(resolution=config.SIZE).start()
+def _start_camera():
+    """
+    Start PiCamera or web cam based on /config.py params
+    :return:
+    """
+    if config.CAMERA == 'pi':
+        return VideoPiStream(resolution=config.SIZE, frame_rate=config.FRAMERATE).start()
     else:
-        from videoCamStream import VideoCamStream
-        return VideoCamStream(src=0).start()
+        return VideoCamStream(resolution=config.SIZE, frame_rate=config.FRAMERATE, src=config.CAMERA).start()
+
 
 def main():
     if len(sys.argv) > 1:
-        config.FILE = sys.argv[0]
-    in_window('', os.path.join(config.DIR, config.FILE))
+        config.BG_FILE = sys.argv[0]
+    in_window(os.path.join(config.DIR, config.BG_FILE))
 
 if __name__ == '__main__':
     main()

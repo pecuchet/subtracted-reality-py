@@ -1,7 +1,6 @@
 import videoStream
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import config
 
 
 class VideoPiStream(videoStream.VideoStream):
@@ -14,6 +13,7 @@ class VideoPiStream(videoStream.VideoStream):
         camera.sharpness = 0
         camera.contrast = 0
         camera.brightness = 50
+        camera.framerate = 30
         camera.saturation = 0
         camera.ISO = 0
         camera.video_stabilization = False
@@ -29,19 +29,21 @@ class VideoPiStream(videoStream.VideoStream):
         camera.crop = (0.0, 0.0, 1.0, 1.0)
     """
 
-    def __init__(self, resolution=config.SIZE, framerate=config.FRAMERATE):
+    def __init__(self, resolution=None, frame_rate=30):
         """
         Initialize the camera and stream
         :param resolution:
-        :param framerate:
+        :param frame_rate:
         """
-        super().__init__()
+        # super().__init__()
+        # Works on Python 3.2 and lower
+        videoStream.VideoStream.__init__(self, resolution)
+
         self.camera = PiCamera()
-        # self.camera.hflip = True
-        # self.camera.vflip = True
-        self.camera.resolution = resolution
-        self.camera.framerate = framerate
-        self.rawCapture = PiRGBArray(self.camera, size=resolution)
+        self.camera.hflip = True if self.MIRROR else False
+        self.camera.resolution = self.resolution
+        self.camera.framerate = frame_rate
+        self.rawCapture = PiRGBArray(self.camera, size=self.resolution)
         self.stream = self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True)
         self.frame = None
         self.stopped = False
