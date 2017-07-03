@@ -29,7 +29,7 @@ class VideoPiStream(videoStream.VideoStream):
         camera.crop = (0.0, 0.0, 1.0, 1.0)
     """
 
-    def __init__(self, resolution=config.SIZE, framerate=25):
+    def __init__(self, resolution=config.SIZE, framerate=config.FRAMERATE):
         """
         Initialize the camera and stream
         :param resolution:
