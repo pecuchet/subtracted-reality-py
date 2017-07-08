@@ -6,3 +6,5 @@ __pycache__
 .rsyncignore
 README.md
 TODO.md
+INSTALL.md
+rpicp.sh

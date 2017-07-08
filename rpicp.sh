@@ -7,4 +7,4 @@ if [ $# -eq 0 ]; then
     ip=192.168.0.3
 fi
 
-rsync . "pi@${ip}:/home/pi/subtracted-reality" -alz --progress --delete --exclude-from=.gitignore
+rsync . "pi@${ip}:/home/pi/subtracted-reality" -alz --progress --delete --exclude-from=.rsyncignore
