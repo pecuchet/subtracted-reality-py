@@ -48,7 +48,7 @@ def on_frame_buffer(bg_file):
         frames = process.subtract(foreground, background)
 
         # Output to Pygame (frame buffer)
-        stop = py_game_inst.render(cv2.add(frames.bg_mask, frames.fg_mask))
+        stop = py_game_inst.render(cv2.add(frames['bg_mask'], frames['fg_mask']))
 
         # update the FPS counter
         if debug:
