@@ -16,7 +16,7 @@ class PyGameRender:
 
         # see https://www.pygame.org/docs/ref/display.html
         # opengl, fullscreen ... options
-        self.screen = pygame.display.set_mode(self.screen_size, 0, 0) #  -2147483648
+        self.screen = pygame.display.set_mode(self.screen_size, pygame.FULLSCREEN | pygame.HWSURFACE, 0) #  -2147483648
         self.surface = pygame.Surface(self.screen.get_size())
 
     def render(self, cv_image):
