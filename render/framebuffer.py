@@ -23,6 +23,7 @@ class PyGameRender:
         # todo can this be somewhere else?
         # todo do we really need all conversions BGR > HSV > BGR > RGB ...
         # todo probably better to convert config HSV colours to RGB
+        # @see https://stackoverflow.com/questions/24852345/hsv-to-rgb-color-conversion
         cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         image = numpy.rot90(cv_image)
 

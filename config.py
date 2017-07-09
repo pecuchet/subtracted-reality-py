@@ -5,6 +5,7 @@ Constants
 """
 
 DEBUG = 1
+LOG = 'debug.log'
 WINDOW_NAME = 'Subtracted reality'
 
 # Sets window and stream sizes

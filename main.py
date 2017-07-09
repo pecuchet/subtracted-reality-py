@@ -31,7 +31,7 @@ def on_frame_buffer(bg_file):
 
     if debug:
         from tests import fps
-        fps = fps.FPS().start()
+        fps = fps.FPS(file=os.path.join(config.DIR, config.LOG)).start()
 
     while True:
         # grab the frame from the threaded video stream

@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 
 class FPS:
@@ -6,9 +7,13 @@ class FPS:
     Adrian Rosebrock's class to echo frame rate to the console.
     @see http://www.pyimagesearch.com/2015/12/21/increasing-webcam-fps-with-python-and-opencv/
     """
-    def __init__(self):
+    def __init__(self, file=None):
+        if file:
+            logging.basicConfig(filename=file, level=logging.DEBUG, format='%(asctime)s %(message)s')
+            logging.info('*-'*20)
         # store the start time, end time, and total number of frames
         # that were examined between the start and end intervals
+        self.log_to_file = file
         self._start = None
         self._end = None
         self._numFrames = 0
@@ -21,8 +26,15 @@ class FPS:
     def stop(self):
         # stop the timer
         self._end = datetime.datetime.now()
-        print("[INFO] elapsed time: {:.2f}".format(self.elapsed()))
-        print("[INFO] approx. FPS: {:.2f}".format(self.fps()))
+        msg_time = "[INFO] elapsed time: {:.2f}".format(self.elapsed())
+        msg_fps = "[INFO] approx. FPS: {:.2f}".format(self.fps())
+        if self.log_to_file:
+            logging.info(msg_time)
+            logging.info(msg_fps)
+            logging.info('*-' * 20)
+        else:
+            print(msg_time)
+            print(msg_fps)
 
     def update(self):
         # increment the total number of frames examined during the
